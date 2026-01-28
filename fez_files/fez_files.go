@@ -75,28 +75,32 @@ func (self *RelativeDirectoryIndex) Convert() AbsoluteDirectoryIndex {
 	}
 	return AbsoluteDirectoryIndex{
 		Name:           self.Name,
-		Subdirectories: subdirs,
+		SubDirectories: subdirs,
 		Files:          files,
 	}
 }
 
 type AbsoluteDirectoryIndex struct {
 	Name           string
-	Subdirectories []AbsoluteDirectoryIndex
+	SubDirectories []AbsoluteDirectoryIndex
 	Files          []AbsoluteIndexedFile
 }
 
 func (self *AbsoluteDirectoryIndex) Encode() (string, error) {
-	str := self.Name + "/\n"
+	str := "\n" + self.Name + "/\n"
 	for _, file := range self.Files {
-		str = str + file.Name + " >> " + file.ChecksumHex + "\n"
+		if file.ChecksumHex == "" {
+			str = str + file.Name + "\n"
+		} else {
+			str = str + file.Name + " >> " + file.ChecksumHex + "\n"
+		}
 	}
-	for _, dir := range self.Subdirectories {
+	for _, dir := range self.SubDirectories {
 		dirstr, err := dir.Encode()
 		if err != nil {
 			return "", err
 		}
-		str = str + "\n" + dirstr
+		str = str + dirstr
 	}
 
 	return str, nil
