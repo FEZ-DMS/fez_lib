@@ -1,14 +1,10 @@
-package main //fez_files
+package fez_files
 
 import (
 	"errors"
-	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/FEZ-DMS/fez_lib/fez_hash"
 )
 
 type _filemodes struct {
@@ -42,6 +38,9 @@ func DoesDirExist(path string) bool {
 		return false
 	}
 }
+
+// relative: file
+// absolute: root/dir/of/file
 
 type RelativeIndexedFile struct {
 	Name        string
@@ -133,7 +132,7 @@ func MakeTree(directory_path string, calculate_checksum bool) (RelativeDirectory
 				if err != nil {
 					return RelativeDirectoryIndex{}, err
 				}
-				h := fez_hash.XXH64Hash{}
+				h := XXH64Hash{}
 				h.Set(data)
 				chksm = h.Hex
 			}
@@ -148,15 +147,4 @@ func MakeTree(directory_path string, calculate_checksum bool) (RelativeDirectory
 	root.Files = files
 
 	return root, nil
-}
-
-func main() {
-	fmt.Println("TEST")
-	thetre, err := MakeTree(filepath.Join(".", "testdir"), true)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fn := thetre.Convert()
-	fmt.Println(fn.Encode())
-	fmt.Println("TEST END")
 }

@@ -12,8 +12,6 @@ import (
 	"errors"
 	"io"
 	"os"
-
-	"github.com/FEZ-DMS/fez_lib/fez_hash"
 )
 
 // AES (only uses GCM, no CBC) {
@@ -155,7 +153,7 @@ func (self *RSAPrivateKey) Decrypt(encrypted []byte) ([]byte, error) {
 	return rsa.DecryptOAEP(sha256.New(), nil, &self._key, encrypted, nil)
 }
 
-func (self *RSAPrivateKey) Sign(hash fez_hash.SHA256Hash) ([]byte, error) {
+func (self *RSAPrivateKey) Sign(hash SHA256Hash) ([]byte, error) {
 	return rsa.SignPKCS1v15(nil, &self._key, crypto.SHA256, hash.Bytes[:])
 }
 
@@ -211,7 +209,7 @@ func (self *RSAPublicKey) Encrypt(b []byte) ([]byte, error) {
 	return rsa.EncryptOAEP(sha256.New(), rand.Reader, &self._key, b, nil)
 }
 
-func (self *RSAPublicKey) VerifySignature(hash fez_hash.SHA256Hash, signature []byte) (bool, error) {
+func (self *RSAPublicKey) VerifySignature(hash SHA256Hash, signature []byte) (bool, error) {
 	err := rsa.VerifyPKCS1v15(&self._key, crypto.SHA256, hash.Bytes[:], signature)
 	return err == nil, err
 }
