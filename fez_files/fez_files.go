@@ -86,8 +86,12 @@ type AbsoluteDirectoryIndex struct {
 	Files          []AbsoluteIndexedFile
 }
 
-func (self *AbsoluteDirectoryIndex) Encode() (string, error) {
-	str := "\n" + self.Name + "/\n"
+func (self *AbsoluteDirectoryIndex) encode(first bool) (string, error) {
+	str := ""
+	if first {
+		str = "@FEZ_INDEX #" + self.Name + "\n"
+	}
+	str = str + "\n" + self.Name + "/\n"
 	for _, file := range self.Files {
 		if file.ChecksumHex == "" {
 			str = str + file.Name + "\n"
@@ -96,7 +100,7 @@ func (self *AbsoluteDirectoryIndex) Encode() (string, error) {
 		}
 	}
 	for _, dir := range self.SubDirectories {
-		dirstr, err := dir.Encode()
+		dirstr, err := dir.encode(false)
 		if err != nil {
 			return "", err
 		}
@@ -104,6 +108,10 @@ func (self *AbsoluteDirectoryIndex) Encode() (string, error) {
 	}
 
 	return str, nil
+}
+
+func (self *AbsoluteDirectoryIndex) Encode() (string, error) {
+	return self.encode(true)
 }
 
 func MakeTree(directory_path string, calculate_checksum bool) (RelativeDirectoryIndex, error) {
